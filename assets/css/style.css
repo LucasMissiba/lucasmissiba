@@ -164,16 +164,16 @@ input, textarea { width: 100%; padding: 10px 12px; border-radius: 12px; border: 
 }
 
 /* Scrollbar translucida */
-html { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.25) transparent; }
+html { scrollbar-width: thin; scrollbar-color: rgba(0,0,0,0.45) transparent; }
 /* Chrome/Edge/Safari */
 ::-webkit-scrollbar { width: 10px; background: transparent; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
-  background: rgba(255,255,255,0.22);
+  background: rgba(0,0,0,0.45);
   border-radius: 8px;
   border: 2px solid rgba(0,0,0,0);
 }
-::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.32); }
+::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.6); }
 
 /* Breakpoints dedicados para o viewer 3D */
 @media (max-width: 639px) {
