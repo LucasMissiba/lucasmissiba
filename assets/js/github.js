@@ -4,7 +4,7 @@
   const username = (window.SITE_CONFIG && window.SITE_CONFIG.githubUsername) || "";
   if (!username) return;
 
-  const excluded = new Set(["gerenciar-tarefas", "primeiro-site-pessoal"]);
+  const excluded = new Set(["gerenciar-tarefas", "primeiro-site-pessoal", "lucasmissiba"]);
 
   function escapeHtml(str) {
     return String(str).replace(/[&<>"']/g, (s) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[s]));
