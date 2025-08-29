@@ -1,0 +1,178 @@
+
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0b0f14" />
+    <title>Ghost Portfolio — Cyberpunk</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="assets/css/style.css" />
+  </head>
+  <body class="loading">
+    <!-- Splash / Preloader -->
+    <div id="splash" class="splash" aria-label="Abertura">
+      <div class="splash-inner">
+        <span class="splash-brand">Lucas Missiba</span>
+        <span class="splash-sub">Creative</span>
+      </div>
+    </div>
+    <header class="site-header reveal" data-parallax data-parallax-speed="0.3">
+      <nav class="nav">
+        <div class="brand neon-text">LM <span>Creative</span></div>
+        <ul>
+          <li><a href="#hero">Início</a></li>
+          <li><a href="#projects">Projetos</a></li>
+          <li><a href="#about">Sobre</a></li>
+          <li><a href="#contact">Contato</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <!-- HERO -->
+      <section id="hero" class="section hero">
+        <canvas id="particles-canvas" aria-hidden="true"></canvas>
+        <div class="container">
+          <h1 class="title neon-text reveal" data-parallax data-parallax-speed="0.2">Lucas <span>Missiba</span></h1>
+          <h2 class="subtitle reveal">Criando o extraordinario a partir do simples</h2>
+          <p class="description reveal">
+            Desenvolvedor focado em criar interfaces imersivas, performáticas e memoráveis.
+          </p>
+          <div class="cta reveal">
+            <a class="btn btn-primary" href="#projects">Ver Projetos</a>
+            <a class="btn btn-ghost" href="#contact">Contato</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- PROJETOS -->
+      <section id="projects" class="section projects">
+        <canvas class="particles-canvas" aria-hidden="true"></canvas>
+        <div class="container">
+          <div class="section-title-wrap reveal">
+            <h3 class="section-title neon-text">Projetos</h3>
+            <a class="title-icon" href="https://github.com/LucasMissiba" target="_blank" rel="noopener noreferrer" aria-label="Abrir GitHub">
+              <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
+                <path fill="currentColor" d="M12 .5C5.73.5.94 5.29.94 11.56c0 4.86 3.15 8.98 7.5 10.44.54.1.74-.24.74-.53 0-.26-.01-1.12-.02-2.04-3.05.66-3.7-1.3-3.7-1.3-.49-1.25-1.2-1.59-1.2-1.59-.98-.67.07-.66.07-.66 1.08.08 1.64 1.11 1.64 1.11.96 1.64 2.51 1.17 3.12.9.1-.7.37-1.17.67-1.44-2.44-.28-5.01-1.22-5.01-5.43 0-1.2.43-2.18 1.12-2.95-.11-.28-.48-1.41.11-2.93 0 0 .92-.29 3.02 1.12.87-.24 1.8-.36 2.73-.37.93 0 1.86.13 2.73.37 2.1-1.41 3.02-1.12 3.02-1.12.59 1.52.22 2.65.11 2.93.69.77 1.12 1.75 1.12 2.95 0 4.22-2.57 5.15-5.02 5.43.38.33.72.99.72 2 0 1.44-.01 2.6-.01 2.95 0 .29.2.64.75.53 4.34-1.46 7.49-5.58 7.49-10.44C23.06 5.29 18.27.5 12 .5z"/>
+              </svg>
+            </a>
+          </div>
+          
+          <div id="projects-grid" class="projects-grid">
+            <!-- Placeholder estático: removido quando a API do GitHub carrega -->
+            <article class="card reveal" data-static>
+              <h4>Projeto Exemplo</h4>
+              <p>Descrição breve do projeto. Integração com API, UI responsiva e animações.</p>
+            </article>
+            <article class="card reveal" data-static>
+              <h4>Interface Neon</h4>
+              <p>Experimento cyberpunk com partículas, paralaxe e efeitos de brilho.</p>
+            </article>
+            <article class="card reveal" data-static>
+              <h4>API Utilities</h4>
+              <p>Utilitários para consumo de APIs com caching e retries.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3D INTERATIVO -->
+      <section id="interactive3d" class="section interactive3d">
+        <div class="container tight">
+          <div id="three-container" class="three-container reveal" aria-label="Seção 3D interativa"></div>
+          <p class="three-caption reveal">Mudar faz Bem</p>
+        </div>
+      </section>
+
+      <!-- SOBRE -->
+      <section id="about" class="section about">
+        <div class="container">
+          <h3 class="section-title neon-text reveal about-title-center">Sobre</h3>
+          <div class="about-grid">
+            <div class="about-text reveal">
+              <p>
+                Sou um criador de soluções digitais que combina lógica, criatividade e tecnologia para transformar processos complexos em sistemas ágeis. Minha especialidade é automatizar, simplificar e dar vida a dados através de dashboards, scripts e aplicações web. Acredito que inovação é a soma entre visão estratégica e execução prática, e é nessa linha que construo meus projetos.
+              </p>
+              <div class="tech-cloud" aria-label="Linguagens e ferramentas">
+                <span>JavaScript</span>
+                <span>TypeScript</span>
+                <span>React</span>
+                <span>Next.js</span>
+                <span>Node.js</span>
+                <span>APIs REST</span>
+                <span>HTML5</span>
+                <span>CSS3</span>
+                <span>Three.js</span>
+                <span>Sketchfab</span>
+                <span>Python</span>
+                <span>Flask</span>
+                <span>Pandas</span>
+                <span>SQL</span>
+                <span>Docker</span>
+                <span>Git</span>
+                <span>GitHub</span>
+                <span>Power BI</span>
+                <span>Vite</span>
+                <span>Webpack</span>
+              </div>
+              
+            </div>
+            
+          </div>
+        </div>
+      </section>
+
+      <!-- CONTATO -->
+      <section id="contact" class="section contact">
+        <div class="container">
+          <h3 class="section-title neon-text reveal">Contato</h3>
+          <div class="contact-grid">
+            <form id="contact-form" class="card glass reveal" autocomplete="on" novalidate>
+              <div class="form-row">
+                <label for="name">Nome</label>
+                <input id="name" name="name" type="text" placeholder="Seu nome" required />
+              </div>
+              <div class="form-row">
+                <label for="email">Email</label>
+                <input id="email" name="email" type="email" placeholder="voce@email.com" required />
+              </div>
+              <div class="form-row">
+                <label for="message">Mensagem</label>
+                <textarea id="message" name="message" rows="4" placeholder="Vamos conversar!" required></textarea>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Enviar</button>
+              </div>
+              <p id="form-status" class="form-status" role="status" aria-live="polite"></p>
+            </form>
+
+            <div class="socials reveal">
+              <a class="btn btn-link" href="https://github.com/LucasMissiba" target="_blank" rel="noreferrer noopener">GitHub</a>
+              <a class="btn btn-link" href="https://www.linkedin.com/in/lucas-missiba-6a95ab179/" target="_blank" rel="noreferrer noopener">LinkedIn</a>
+              <a class="btn btn-link" href="https://lava-ice-620.notion.site/Portfolio-Lucas-Missiba-Tech-21e1486be86c807b8e0eda1ee76f96c7" target="_blank" rel="noreferrer noopener">Portfolio</a>
+              <a class="btn btn-link" href="#projects">Ver Projetos</a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <span>© <span id="year"></span> LM Creative</span>
+      </div>
+    </footer>
+
+    <!-- Config e scripts -->
+    <script src="assets/js/config.js" defer></script>
+    <script src="assets/js/main.js" defer></script>
+    <script src="assets/js/particles.js" defer></script>
+    <script src="assets/js/github.js" defer></script>
+    <script src="assets/js/three-section.js" defer></script>
+  </body>
+  </html>
+
+
