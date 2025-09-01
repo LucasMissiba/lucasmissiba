@@ -1,40 +1,13 @@
-# 🌌 Portfólio - Lucas Missiba
+# 👋 Olá, eu sou o Lucas Missiba  
 
-Bem-vindo ao meu portfólio pessoal! 🚀  
-Este site foi desenvolvido para apresentar meus projetos, habilidades e minha forma de criar experiências digitais que unem **simplicidade, imersão e performance**.  
+Bem-vindo ao meu GitHub! Aqui você encontra meus projetos e estudos em desenvolvimento web, automação e análise de dados. 🚀  
 
-🔗 **Acesse o site:** [lucasmissiba.github.io/lucasmissiba](https://lucasmissiba.github.io/lucasmissiba/)
+🔗 Confira mais sobre mim:  
+- 🌐 [Portfólio](https://lucasmissiba.github.io/lucasmissiba/)  
+- 💼 [LinkedIn](https://www.linkedin.com/in/lucasmissiba)  
+- 💻 [GitHub](https://github.com/LucasMissiba)  
 
----
-
-## ✨ Sobre o projeto
-O objetivo do portfólio é reunir minhas principais criações e destacar minha atuação como desenvolvedor.  
-Busquei criar um design moderno e imersivo, inspirado em um estilo futurista e minimalista.  
-
----
-
-## 🛠️ Tecnologias utilizadas
-- **HTML5**  
-- **CSS3 (com design responsivo e animações)**  
-- **JavaScript (interações e efeitos dinâmicos)**  
-
----
-
-## 📂 Estrutura
-- `index.html` → Página inicial  
-- `style.css` → Estilos principais  
-- `script.js` → Funcionalidades interativas  
-
----
-
-## 🚀 Funcionalidades
-- Layout moderno e responsivo  
-- Navegação intuitiva  
-- Efeitos visuais com estilo imersivo  
-- Sessão de projetos e contato  
-
----
-
+✉️ **lucasmissiba9@gmail.com**
 ## 📬 Contato
 Caso queira trocar ideias ou colaborar em projetos, entre em contato:  
 
