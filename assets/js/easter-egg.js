@@ -112,6 +112,9 @@
     const stars = [];
     const columns = [];
     const enemies = [];
+    let boss = null;
+    const bossBullets = [];
+    let nextBossScore = 100;
     const bullets = [];
 
     const config = {
@@ -124,6 +127,7 @@
       enemySpawnMs: 1500,
       columnSpeed: 140,
       enemySpeed: 160,
+      bossHP: 30,
       columnWMin: 3,
       columnWMax: 6,
       columnHMin: 60,
@@ -163,7 +167,14 @@
     function spawnEnemy() {
       const w = 20, h = 24;
       const x = Math.round(randomBetween(10, canvas.clientWidth - w - 10));
-      enemies.push({ x, y: -h, w, h, vy: config.enemySpeed, t: Math.random() * Math.PI * 2 });
+      const type = Math.floor(Math.random() * 3); // 0..2
+      enemies.push({ x, y: -h, w, h, vy: config.enemySpeed, t: Math.random() * Math.PI * 2, type });
+    }
+
+    function spawnBoss() {
+      const size = Math.min(120, Math.floor(canvas.clientWidth * 0.35));
+      const w = size, h = Math.round(size * 0.7);
+      boss = { x: Math.round(canvas.clientWidth / 2 - w / 2), y: 24, w, h, hp: config.bossHP, lastShot: 0 };
     }
 
     function shoot(now) {
@@ -233,9 +244,8 @@
       for (const c of columns) ctx.fillRect(c.x | 0, c.y | 0, c.w | 0, c.h | 0);
     }
 
-    function drawAlien(x, y, s) {
-      // Pixel-art simples de ET (12x8) escalável
-      const pixels = [
+    const alienSprites = [
+      [
         '000110011000',
         '001111111100',
         '011011110110',
@@ -244,7 +254,32 @@
         '101001001101',
         '001100001100',
         '010010010010'
-      ];
+      ],
+      [
+        '001111110000',
+        '011111111000',
+        '111001001100',
+        '111111111100',
+        '011111111000',
+        '010110110000',
+        '001001001000',
+        '010000000100'
+      ],
+      [
+        '000111100000',
+        '001111110000',
+        '011101111000',
+        '111111111100',
+        '110111101100',
+        '010010010100',
+        '001100110000',
+        '000100010000'
+      ]
+    ];
+
+    function drawAlien(x, y, s, type = 0) {
+      // Pixel-art ET escalável
+      const pixels = alienSprites[type % alienSprites.length];
       ctx.fillStyle = '#ffffff';
       const px = Math.max(1, Math.floor(s / 12));
       for (let r = 0; r < pixels.length; r++) {
@@ -255,7 +290,24 @@
     }
 
     function drawEnemies() {
-      for (const e of enemies) drawAlien(e.x, e.y, Math.max(e.w, e.h));
+      for (const e of enemies) drawAlien(e.x, e.y, Math.max(e.w, e.h), e.type || 0);
+    }
+
+    function drawBoss() {
+      if (!boss) return;
+      // Boss como ET gigante
+      drawAlien(boss.x, boss.y, Math.max(boss.w, boss.h), 1);
+      // barra de vida
+      const bw = Math.max(40, boss.w * 0.8), bh = 4;
+      const bx = Math.round(canvas.clientWidth / 2 - bw / 2), by = boss.y + boss.h + 6;
+      ctx.fillStyle = 'rgba(255,255,255,0.2)';
+      ctx.fillRect(bx, by, bw, bh);
+      ctx.fillStyle = '#ffffff';
+      const hpw = Math.max(0, Math.floor((boss.hp / config.bossHP) * bw));
+      ctx.fillRect(bx, by, hpw, bh);
+      // projéteis do boss
+      ctx.fillStyle = '#ffffff';
+      for (const bb of bossBullets) ctx.fillRect(bb.x|0, bb.y|0, 3, 8);
     }
 
     function drawBullets() {
@@ -284,9 +336,14 @@
 
       if (keys.has('Space')) shoot(now);
 
-      // spawns
-      if (now - lastColSpawn > config.columnSpawnMs) { spawnColumn(); lastColSpawn = now; }
-      if (now - lastEnemySpawn > config.enemySpawnMs) { spawnEnemy(); lastEnemySpawn = now; }
+      // boss spawn gating
+      if (!boss && score >= nextBossScore) spawnBoss();
+
+      // spawns (pausados durante o boss)
+      if (!boss) {
+        if (now - lastColSpawn > config.columnSpawnMs) { spawnColumn(); lastColSpawn = now; }
+        if (now - lastEnemySpawn > config.enemySpawnMs) { spawnEnemy(); lastEnemySpawn = now; }
+      }
 
       // atualiza colunas e inimigos
       for (const c of columns) c.y += c.vy * dt;
@@ -294,8 +351,22 @@
 
       // balas
       for (const b of bullets) b.y += b.vy * dt;
+      // tiros do boss
+      if (boss) {
+        boss.lastShot += dt * 1000;
+        const cadence = 550; // ms
+        if (boss.lastShot >= cadence) {
+          boss.lastShot = 0;
+          const lanes = 3;
+          for (let i = 0; i < lanes; i++) {
+            const px = boss.x + (i + 1) * (boss.w / (lanes + 1));
+            bossBullets.push({ x: px, y: boss.y + boss.h - 4, vy: 230 });
+          }
+        }
+        for (const bb of bossBullets) bb.y += bb.vy * dt;
+      }
 
-      // colisões bala x inimigos/colunas
+      // colisões bala x inimigos/colunas/boss
       for (const b of bullets) {
         if (b._dead) continue;
         for (const e of enemies) {
@@ -304,17 +375,27 @@
         if (!b._dead) {
           for (const c of columns) { if (!c._dead && aabb(b, c)) { c._dead = true; b._dead = true; score += 5; break; } }
         }
+        if (!b._dead && boss) {
+          if (aabb(b, boss)) { b._dead = true; boss.hp -= 1; if (boss.hp <= 0) { score += 100; boss = null; nextBossScore += 100; } }
+        }
       }
 
       // colisões player x obstaculos
       for (const e of enemies) if (!e._dead && aabb(player, e)) { e._dead = true; lives -= 1; }
       for (const c of columns) if (!c._dead && aabb(player, c)) { c._dead = true; lives -= 1; }
+      // colisão player x tiros do boss
+      for (const bb of bossBullets) {
+        if (player.x < bb.x + 3 && player.x + player.w > bb.x && player.y < bb.y + 8 && player.y + player.h > bb.y) {
+          bb._dead = true; lives -= 1;
+        }
+      }
 
       // limpeza
-      function inView(o) { return o.y < canvas.clientHeight + 40 && o.y + (o.h || 0) > -40; }
+      function inView(o) { return o.y < canvas.clientHeight + 40 && (o.y + (o.h || 0)) > -40; }
       for (let i = bullets.length - 1; i >= 0; i--) if (bullets[i]._dead || bullets[i].y + bullets[i].h < 0) bullets.splice(i, 1);
       for (let i = enemies.length - 1; i >= 0; i--) if (enemies[i]._dead || !inView(enemies[i])) enemies.splice(i, 1);
       for (let i = columns.length - 1; i >= 0; i--) if (columns[i]._dead || !inView(columns[i])) columns.splice(i, 1);
+      for (let i = bossBullets.length - 1; i >= 0; i--) if (bossBullets[i]._dead || !inView(bossBullets[i])) bossBullets.splice(i, 1);
     }
 
     function drawGame() {
@@ -322,6 +403,7 @@
       drawColumns();
       drawEnemies();
       drawBullets();
+      drawBoss();
       drawPlayer();
     }
 
@@ -369,7 +451,8 @@
 
     function reset() {
       score = 0; lives = 3;
-      stars.length = 0; columns.length = 0; enemies.length = 0; bullets.length = 0;
+      stars.length = 0; columns.length = 0; enemies.length = 0; bullets.length = 0; bossBullets.length = 0;
+      boss = null; nextBossScore = 100;
       resetPlayer();
       setHud();
     }
