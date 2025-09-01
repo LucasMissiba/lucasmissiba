@@ -278,7 +278,7 @@
 
     function open() {
       visible = true;
-      running = false;
+      running = true;
       state = 'menu';
       setHud();
       drawMenu();
@@ -290,6 +290,7 @@
       visible = false;
       running = false;
       cancelAnimationFrame(rafId);
+      rafId = 0;
     }
 
     function handlePointerClick(evt) {
@@ -347,8 +348,8 @@
     fitCanvas(canvas);
 
     const game = createGame(ctx, canvas, hud);
-    game.open();
-    game.startGame();
+    // garante inicio em navegadores que pausam rAF fora de foco
+    setTimeout(() => { game.open(); game.startGame(); }, 0);
     return game;
   }
 
