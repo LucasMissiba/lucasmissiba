@@ -297,10 +297,16 @@
     return { open, close, startGame, reset, isVisible: () => visible, state: () => state };
   }
 
-  document.addEventListener('DOMContentLoaded', () => {
-    const trigger = document.getElementById('egg-trigger');
-    if (!trigger) return;
+  function findTrigger() {
+    let t = document.getElementById('egg-trigger');
+    if (t) return t;
+    // fallback: procurar pelo texto "Mudar faz Bem" na legenda
+    const cands = Array.from(document.querySelectorAll('.three-caption'));
+    t = cands.find(el => /mudar\s*faz\s*bem/i.test((el.textContent || '').trim())) || null;
+    return t;
+  }
 
+  function setupWithTrigger(trigger) {
     const { overlay, canvas, hud, closeBtn, btnA, btnB, startPill, selectPill } = createOverlay();
 
     const ctx = canvas.getContext('2d');
@@ -325,10 +331,17 @@
     }
 
     trigger.style.cursor = 'pointer';
+    trigger.setAttribute('role', trigger.getAttribute('role') || 'button');
+    trigger.setAttribute('tabindex', trigger.getAttribute('tabindex') || '0');
+    trigger.title = trigger.title || 'Abrir mini jogo';
     trigger.addEventListener('click', showOverlay);
     trigger.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); showOverlay(); }
     });
+
+    // extras: abrir com duplo clique na area 3D
+    const three = document.getElementById('three-container');
+    if (three) three.addEventListener('dblclick', showOverlay);
 
     closeBtn.addEventListener('click', hideOverlay);
     btnA.addEventListener('click', () => {
@@ -343,7 +356,24 @@
     overlay.addEventListener('click', (e) => {
       if (e.target === overlay) hideOverlay();
     });
-  });
+  }
+
+  function init() {
+    const t = findTrigger();
+    if (t) { setupWithTrigger(t); return; }
+    // fallback: observar até aparecer (caso o HTML seja reidratado/trocado)
+    const mo = new MutationObserver(() => {
+      const x = findTrigger();
+      if (x) { mo.disconnect(); setupWithTrigger(x); }
+    });
+    mo.observe(document.documentElement, { childList: true, subtree: true });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
 })();
 
 
