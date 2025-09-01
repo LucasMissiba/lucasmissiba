@@ -110,11 +110,11 @@
     let state = 'menu'; // 'menu' | 'playing' | 'gameover'
 
     const config = {
-      spawnEveryMs: 650,
+      spawnEveryMs: 700,
       minRadius: 8,
       maxRadius: 16,
-      minSpeed: 70,
-      maxSpeed: 150
+      minSpeed: 90,
+      maxSpeed: 160
     };
 
     function randomBetween(min, max) { return Math.random() * (max - min) + min; }
@@ -188,8 +188,10 @@
     function update(dt) {
       for (const s of stars) {
         if (!s.alive) continue;
-        s.y += s.vy * dt;
-        if (s.y - s.r > canvas.clientHeight) {
+        // deslocamento lateral tipo runner
+        s.x -= s.vy * dt * 0.7;
+        s.y = Math.max(10, s.y);
+        if (s.x + s.r < 0) {
           s.alive = false;
           lives -= 1;
         }
@@ -203,9 +205,23 @@
       }
     }
 
+    function drawGround() {
+      const h = canvas.clientHeight;
+      ctx.fillStyle = DMG.mid;
+      ctx.fillRect(0, h - 26, canvas.clientWidth, 2);
+      // marcas de chão
+      ctx.fillStyle = DMG.dark;
+      const step = 18;
+      for (let x = 0; x < canvas.clientWidth; x += step) ctx.fillRect(x, h - 20, 8, 2);
+    }
+
     function drawGame() {
       drawBackground();
+      drawGround();
       for (const s of stars) drawStar(s);
+      // personagem simples
+      ctx.fillStyle = DMG.darkest;
+      ctx.fillRect(40, canvas.clientHeight - 42, 22, 22);
     }
 
     function loop(prevTs) {
@@ -261,32 +277,29 @@
     }
 
     function handlePointerClick(evt) {
+      // pulo via clique
       if (state !== 'playing') return;
-      const rect = canvas.getBoundingClientRect();
-      const x = evt.clientX - rect.left;
-      const y = evt.clientY - rect.top;
-      for (const s of stars) {
-        const dx = s.x - x;
-        const dy = s.y - y;
-        if (dx * dx + dy * dy <= (s.r * 0.9) * (s.r * 0.9)) {
-          s.alive = false;
-          score += 1;
-          break;
-        }
-      }
+      jump();
+    }
+
+    let isJumping = false; let vy = 0; const g = 1400; // simulação simples
+    function jump() {
+      if (isJumping) return;
+      isJumping = true; vy = -520;
     }
 
     function keyHandler(e) {
       if (!visible) return;
       if (e.key === 'Escape') { close(); return; }
       if (state === 'menu') {
-        if (e.key === 'Enter' || e.key.toLowerCase() === 'a') startGame();
+        if (e.key === 'Enter' || e.code === 'Space' || e.key.toLowerCase() === 'a') startGame();
         if (e.key.toLowerCase() === 'b') close();
       } else if (state === 'playing') {
         if (e.key.toLowerCase() === 'r') reset();
+        if (e.code === 'Space' || e.code === 'ArrowUp') jump();
         if (e.key.toLowerCase() === 'b') { state = 'menu'; running = false; drawMenu(); }
       } else if (state === 'gameover') {
-        if (e.key === 'Enter' || e.key.toLowerCase() === 'a') startGame();
+        if (e.key === 'Enter' || e.code === 'Space' || e.key.toLowerCase() === 'a') startGame();
         if (e.key.toLowerCase() === 'b') close();
       }
     }
@@ -306,7 +319,35 @@
     return t;
   }
 
+  function setupInline(inlineHost) {
+    // constrói um canvas/hud inline no container pedido
+    const canvas = document.createElement('canvas');
+    const hud = document.createElement('div');
+    hud.className = 'hud';
+    inlineHost.innerHTML = '';
+    inlineHost.appendChild(canvas);
+    inlineHost.appendChild(hud);
+    inlineHost.hidden = false;
+
+    const ctx = canvas.getContext('2d');
+    const ro = new ResizeObserver(() => fitCanvas(canvas));
+    ro.observe(inlineHost);
+    fitCanvas(canvas);
+
+    const game = createGame(ctx, canvas, hud);
+    game.open();
+    game.startGame();
+    return game;
+  }
+
   function setupWithTrigger(trigger) {
+    const inlineHost = document.getElementById('egg-inline');
+    if (inlineHost) {
+      trigger.addEventListener('click', () => setupInline(inlineHost));
+      trigger.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setupInline(inlineHost); } });
+      return; // usa inline, não overlay
+    }
+
     const { overlay, canvas, hud, closeBtn, btnA, btnB, startPill, selectPill } = createOverlay();
 
     const ctx = canvas.getContext('2d');
