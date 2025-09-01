@@ -99,7 +99,7 @@
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
 
-  function createGame(ctx, canvas, hud) {
+  function createGame(ctx, canvas, hud, scopeEl) {
     // Shooter vertical PB
     let score = 0;
     let lives = 3;
@@ -333,8 +333,25 @@
     function open() { visible = true; running = true; state = 'menu'; resetPlayer(); setHud(); cancelAnimationFrame(rafId); loop(performance.now()); }
     function close() { visible = false; running = false; cancelAnimationFrame(rafId); rafId = 0; }
 
-    function keyDown(e) { keys.add(e.code === 'Space' ? 'Space' : e.key); }
-    function keyUp(e) { keys.delete(e.code === 'Space' ? 'Space' : e.key); }
+    function isActive() {
+      if (!visible) return false;
+      if (!scopeEl) return true;
+      const a = document.activeElement;
+      return a === scopeEl || (a && scopeEl.contains(a));
+    }
+
+    function keyDown(e) {
+      if (isActive()) {
+        if (e.code === 'Space' || e.key === ' ' || e.key.startsWith('Arrow')) e.preventDefault();
+        keys.add(e.code === 'Space' ? 'Space' : e.key);
+      }
+    }
+    function keyUp(e) {
+      if (isActive()) {
+        if (e.code === 'Space' || e.key === ' ' || e.key.startsWith('Arrow')) e.preventDefault();
+        keys.delete(e.code === 'Space' ? 'Space' : e.key);
+      }
+    }
 
     function keyHandler(e) {
       if (!visible) return;
@@ -348,9 +365,9 @@
       }
     }
 
-    window.addEventListener('keydown', keyDown);
-    window.addEventListener('keyup', keyUp);
-    window.addEventListener('keydown', keyHandler);
+    window.addEventListener('keydown', keyDown, { passive: false });
+    window.addEventListener('keyup', keyUp, { passive: false });
+    window.addEventListener('keydown', keyHandler, { passive: false });
 
     return { open, close, startGame, reset, isVisible: () => visible, state: () => state };
   }
@@ -373,15 +390,17 @@
     inlineHost.appendChild(canvas);
     inlineHost.appendChild(hud);
     inlineHost.hidden = false;
+    inlineHost.tabIndex = 0;
+    inlineHost.style.outline = 'none';
 
     const ctx = canvas.getContext('2d');
     const ro = new ResizeObserver(() => fitCanvas(canvas));
     ro.observe(inlineHost);
     fitCanvas(canvas);
 
-    const game = createGame(ctx, canvas, hud);
-    // garante inicio em navegadores que pausam rAF fora de foco
-    setTimeout(() => { game.open(); game.startGame(); }, 0);
+    const game = createGame(ctx, canvas, hud, inlineHost);
+    // garante foco e inicio em navegadores que pausam rAF fora de foco
+    setTimeout(() => { inlineHost.focus({ preventScroll: true }); game.open(); game.startGame(); }, 0);
     return game;
   }
 
