@@ -49,9 +49,11 @@
           success: (api) => {
             api.start();
             api.addEventListener("viewerready", () => {
+              // Proteção: algumas vezes pos/target podem vir nulos
               try {
                 api.getCameraLookAt((pos, target) => {
-                  const zoomFactor = 2.2; // afasta ainda mais para garantir modelo completo
+                  if (!pos || !target || pos.length < 3 || target.length < 3) return;
+                  const zoomFactor = 2.2;
                   const dir = [pos[0] - target[0], pos[1] - target[1], pos[2] - target[2]];
                   const newPos = [
                     target[0] + dir[0] * zoomFactor,
@@ -60,7 +62,10 @@
                   ];
                   api.setCameraLookAt(newPos, target, 0.6, () => {});
                 });
-              } catch (_) {}
+              } catch (e) {
+                // ignora caso a API esteja com permissões de sensores bloqueadas
+                console.debug("Sketchfab camera init skipped", e);
+              }
             });
           },
           error: () => {
