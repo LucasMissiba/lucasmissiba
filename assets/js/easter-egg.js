@@ -185,14 +185,43 @@
     }
 
     function drawPlayer() {
-      ctx.fillStyle = '#ffffff';
-      // nave triangular PB
+      const x = player.x, y = player.y, w = player.w, h = player.h;
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 2;
+      ctx.fillStyle = '#0f0f0f';
+
+      // Corpo com curvas (contorno branco)
       ctx.beginPath();
-      ctx.moveTo(player.x + player.w / 2, player.y); // topo
-      ctx.lineTo(player.x, player.y + player.h);
-      ctx.lineTo(player.x + player.w, player.y + player.h);
+      ctx.moveTo(w * 0.50, 0);
+      ctx.quadraticCurveTo(w * 0.28, h * 0.10, w * 0.24, h * 0.28);
+      ctx.quadraticCurveTo(w * 0.22, h * 0.46, w * 0.30, h * 0.60);
+      ctx.quadraticCurveTo(w * 0.20, h * 0.72, w * 0.28, h * 0.82);
+      ctx.lineTo(w * 0.38, h * 0.92);
+      ctx.lineTo(w * 0.50, h * 1.00);
+      ctx.lineTo(w * 0.62, h * 0.92);
+      ctx.quadraticCurveTo(w * 0.72, h * 0.82, w * 0.70, h * 0.60);
+      ctx.quadraticCurveTo(w * 0.78, h * 0.46, w * 0.76, h * 0.28);
+      ctx.quadraticCurveTo(w * 0.72, h * 0.10, w * 0.50, 0);
       ctx.closePath();
       ctx.fill();
+      ctx.stroke();
+
+      // Janela circular
+      ctx.beginPath();
+      ctx.arc(w * 0.50, h * 0.26, Math.max(1, w * 0.12), 0, Math.PI * 2);
+      ctx.stroke();
+
+      // Motores inferiores (meia-lua)
+      ctx.beginPath();
+      ctx.arc(w * 0.38, h * 0.94, w * 0.09, Math.PI, 0, false);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(w * 0.62, h * 0.94, w * 0.09, Math.PI, 0, false);
+      ctx.stroke();
+
+      ctx.restore();
     }
 
     function drawColumns() {
