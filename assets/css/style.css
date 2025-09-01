@@ -107,7 +107,7 @@ html { scroll-behavior: smooth; }
 .three-mask-bottom { bottom: 0; height: clamp(100px, 15vh, 200px); background: linear-gradient(0deg, var(--bg-0) 0%, var(--bg-0) 60%, rgba(0,0,0,0) 100%); }
 .three-fallback { position: absolute; inset: 0; display: grid; place-items: center; padding: 16px; text-align: center; color: var(--muted); background: linear-gradient(180deg, rgba(10,14,23,0.3), rgba(10,11,16,0.3)); }
 .hint { color: var(--muted); margin-top: 10px; }
-.three-caption { margin-top: 12px; font-family: "Orbitron", sans-serif; text-transform: uppercase; letter-spacing: 0.08em; color: #ffffff; text-shadow: 0 0 10px rgba(255,255,255,0.25); text-align: center; }
+.three-caption { margin-top: 12px; font-family: "Orbitron", sans-serif; text-transform: uppercase; letter-spacing: 0.08em; color: #ffffff; text-shadow: 0 0 10px rgba(255,255,255,0.25); text-align: center; cursor: pointer; pointer-events: auto; }
 
 /* Easter Egg - Game Boy Overlay (preto e branco) */
 .egg-overlay { position: fixed; inset: 0; display: none; place-items: center; background: rgba(0,0,0,0.9); z-index: 10000; }

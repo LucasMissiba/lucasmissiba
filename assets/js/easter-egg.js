@@ -339,6 +339,15 @@
       if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); showOverlay(); }
     });
 
+    // delegação extra: clicar em qualquer .three-caption abre também
+    const interactiveSection = document.getElementById('interactive3d');
+    if (interactiveSection) {
+      interactiveSection.addEventListener('click', (ev) => {
+        const el = ev.target;
+        if (el && el.classList && el.classList.contains('three-caption')) showOverlay();
+      });
+    }
+
     // extras: abrir com duplo clique na area 3D
     const three = document.getElementById('three-container');
     if (three) three.addEventListener('dblclick', showOverlay);
