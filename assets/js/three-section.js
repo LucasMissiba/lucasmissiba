@@ -13,6 +13,10 @@
     iframe.allow = "autoplay; fullscreen; xr-spatial-tracking";
     iframe.setAttribute("allowfullscreen", "true");
     container.appendChild(iframe);
+    // aplica filtro PB no iframe quando carregar
+    iframe.addEventListener('load', () => {
+      try { iframe.style.filter = 'grayscale(1) contrast(1.05)'; } catch (_) {}
+    });
 
     function loadSketchfabApi() {
       return new Promise((resolve, reject) => {
@@ -103,9 +107,9 @@
       renderer.toneMappingExposure = 1.0;
       container.appendChild(renderer.domElement);
 
-      const hemi = new THREE.HemisphereLight(0x4dd0ff, 0x06080c, 0.8);
+      const hemi = new THREE.HemisphereLight(0xffffff, 0x0a0a0a, 0.7);
       scene.add(hemi);
-      const dir = new THREE.DirectionalLight(0xff3cac, 0.9);
+      const dir = new THREE.DirectionalLight(0xffffff, 0.9);
       dir.position.set(2, 5, 3);
       scene.add(dir);
 
@@ -161,17 +165,16 @@
         const group = new THREE.Group();
         const geo = new THREE.TorusKnotGeometry(1, 0.35, 220, 36);
         const mat = new THREE.MeshStandardMaterial({
-          color: 0x6f3cff,
-          emissive: 0x301060,
-          emissiveIntensity: 1.2,
-          metalness: 0.6,
-          roughness: 0.2,
+          color: 0xffffff,
+          emissive: 0x0,
+          metalness: 0.1,
+          roughness: 0.5,
         });
         const mesh = new THREE.Mesh(geo, mat);
         group.add(mesh);
 
         const glowGeo = new THREE.SphereGeometry(1.2, 32, 32);
-        const glowMat = new THREE.MeshBasicMaterial({ color: 0x4dd0ff, transparent: true, opacity: 0.06 });
+        const glowMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.08 });
         const glow = new THREE.Mesh(glowGeo, glowMat);
         group.add(glow);
 
