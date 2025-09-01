@@ -15,7 +15,7 @@
     container.appendChild(iframe);
     // aplica filtro PB no iframe quando carregar
     iframe.addEventListener('load', () => {
-      try { iframe.style.filter = 'grayscale(1) contrast(1.05)'; } catch (_) {}
+      try { iframe.style.filter = 'none'; } catch (_) {}
     });
 
     function loadSketchfabApi() {

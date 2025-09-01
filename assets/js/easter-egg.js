@@ -117,13 +117,18 @@
       maxSpeed: 160
     };
 
+    // runner: estado do jogador
+    const player = { x: 40, y: 0, size: 22, vy: 0, jumping: false };
+    const gravity = 1400;
+    function groundY() { return canvas.clientHeight - 26; }
+
     function randomBetween(min, max) { return Math.random() * (max - min) + min; }
 
     function spawnStar() {
       const r = randomBetween(config.minRadius, config.maxRadius);
       stars.push({
-        x: randomBetween(r, canvas.clientWidth - r),
-        y: -r,
+        x: canvas.clientWidth + r,
+        y: groundY() - r,
         r,
         vy: randomBetween(config.minSpeed, config.maxSpeed),
         alive: true
@@ -166,10 +171,9 @@
       ctx.fillStyle = DMG.darkest;
       ctx.textAlign = 'center';
       ctx.font = '700 24px Orbitron, system-ui, sans-serif';
-      ctx.fillText('STAR POP', canvas.clientWidth / 2, canvas.clientHeight * 0.38);
+      ctx.fillText('RUNNER', canvas.clientWidth / 2, canvas.clientHeight * 0.38);
       ctx.font = '400 14px Rajdhani, system-ui, sans-serif';
-      ctx.fillText('A: Iniciar  •  B: Sair', canvas.clientWidth / 2, canvas.clientHeight * 0.50);
-      ctx.fillText('Start: Iniciar  •  Select: Reset', canvas.clientWidth / 2, canvas.clientHeight * 0.58);
+      ctx.fillText('Espaço/↑ para iniciar e pular', canvas.clientWidth / 2, canvas.clientHeight * 0.52);
     }
 
     function drawGameOver() {
@@ -186,15 +190,27 @@
     }
 
     function update(dt) {
+      // jogador
+      const base = groundY() - player.size;
+      if (player.jumping) {
+        player.vy += gravity * dt;
+        player.y += player.vy * dt;
+        if (player.y >= base) { player.y = base; player.vy = 0; player.jumping = false; }
+      } else {
+        player.y = base;
+      }
+
+      // obstaculos
       for (const s of stars) {
         if (!s.alive) continue;
-        // deslocamento lateral tipo runner
         s.x -= s.vy * dt * 0.7;
-        s.y = Math.max(10, s.y);
-        if (s.x + s.r < 0) {
-          s.alive = false;
-          lives -= 1;
-        }
+        if (s.x + s.r < 0) { s.alive = false; score += 1; }
+        // colisao círculo x retângulo
+        const px = player.x, py = player.y, pw = player.size, ph = player.size;
+        const nx = Math.max(px, Math.min(s.x, px + pw));
+        const ny = Math.max(py, Math.min(s.y, py + ph));
+        const dx = s.x - nx, dy = s.y - ny;
+        if (dx*dx + dy*dy <= s.r*s.r) { s.alive = false; lives -= 1; }
       }
       stars = stars.filter(s => s.alive);
 
@@ -221,7 +237,7 @@
       for (const s of stars) drawStar(s);
       // personagem simples
       ctx.fillStyle = DMG.darkest;
-      ctx.fillRect(40, canvas.clientHeight - 42, 22, 22);
+      ctx.fillRect(player.x, Math.round(player.y), player.size, player.size);
     }
 
     function loop(prevTs) {
@@ -282,11 +298,7 @@
       jump();
     }
 
-    let isJumping = false; let vy = 0; const g = 1400; // simulação simples
-    function jump() {
-      if (isJumping) return;
-      isJumping = true; vy = -520;
-    }
+    function jump() { if (!player.jumping) { player.jumping = true; player.vy = -520; } }
 
     function keyHandler(e) {
       if (!visible) return;
