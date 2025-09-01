@@ -115,9 +115,9 @@
     const bullets = [];
 
     const config = {
-      starCount: 80,
-      starMinSpeed: 18,
-      starMaxSpeed: 60,
+      starCount: 140,
+      starMinSpeed: 24,
+      starMaxSpeed: 90,
       playerSpeed: 220,
       bulletSpeed: 520,
       columnSpawnMs: 900,
@@ -177,9 +177,10 @@
     function drawBackground() {
       ctx.fillStyle = '#0f0f0f';
       ctx.fillRect(0, 0, canvas.clientWidth, canvas.clientHeight);
-      // estrelas
-      ctx.fillStyle = '#ffffff';
+      // estrelas com variação de brilho
       for (const st of stars) {
+        const alpha = st.r === 2 ? 1.0 : 0.7 + 0.3 * Math.sin((performance.now() * 0.004 + st.x + st.y));
+        ctx.fillStyle = `rgba(255,255,255,${alpha.toFixed(2)})`;
         ctx.fillRect(st.x | 0, st.y | 0, st.r, st.r);
       }
     }
@@ -232,7 +233,30 @@
       for (const c of columns) ctx.fillRect(c.x | 0, c.y | 0, c.w | 0, c.h | 0);
     }
 
-    function drawEnemies() { for (const e of enemies) drawShip(e.x, e.y, e.w, e.h, Math.PI); }
+    function drawAlien(x, y, s) {
+      // Pixel-art simples de ET (12x8) escalável
+      const pixels = [
+        '000110011000',
+        '001111111100',
+        '011011110110',
+        '111111111111',
+        '101111111101',
+        '101001001101',
+        '001100001100',
+        '010010010010'
+      ];
+      ctx.fillStyle = '#ffffff';
+      const px = Math.max(1, Math.floor(s / 12));
+      for (let r = 0; r < pixels.length; r++) {
+        for (let c = 0; c < pixels[r].length; c++) {
+          if (pixels[r][c] === '1') ctx.fillRect(x + c * px, y + r * px, px, px);
+        }
+      }
+    }
+
+    function drawEnemies() {
+      for (const e of enemies) drawAlien(e.x, e.y, Math.max(e.w, e.h));
+    }
 
     function drawBullets() {
       ctx.fillStyle = '#ffffff';
