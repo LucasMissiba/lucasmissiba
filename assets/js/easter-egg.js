@@ -116,14 +116,14 @@
 
     const config = {
       starCount: 80,
-      starMinSpeed: 28,
-      starMaxSpeed: 90,
-      playerSpeed: 280,
+      starMinSpeed: 18,
+      starMaxSpeed: 60,
+      playerSpeed: 220,
       bulletSpeed: 520,
       columnSpawnMs: 900,
       enemySpawnMs: 1500,
-      columnSpeed: 180,
-      enemySpeed: 200,
+      columnSpeed: 140,
+      enemySpeed: 160,
       columnWMin: 3,
       columnWMax: 6,
       columnHMin: 60,
@@ -161,7 +161,7 @@
     }
 
     function spawnEnemy() {
-      const w = 16, h = 18;
+      const w = 20, h = 24;
       const x = Math.round(randomBetween(10, canvas.clientWidth - w - 10));
       enemies.push({ x, y: -h, w, h, vy: config.enemySpeed, t: Math.random() * Math.PI * 2 });
     }
@@ -184,10 +184,11 @@
       }
     }
 
-    function drawPlayer() {
-      const x = player.x, y = player.y, w = player.w, h = player.h;
+    function drawShip(x, y, w, h, angleRad) {
       ctx.save();
-      ctx.translate(x, y);
+      ctx.translate(x + w / 2, y + h / 2);
+      if (angleRad) ctx.rotate(angleRad);
+      ctx.translate(-w / 2, -h / 2);
       ctx.strokeStyle = '#ffffff';
       ctx.lineWidth = 2;
       ctx.fillStyle = '#0f0f0f';
@@ -224,22 +225,14 @@
       ctx.restore();
     }
 
+    function drawPlayer() { drawShip(player.x, player.y, player.w, player.h, 0); }
+
     function drawColumns() {
       ctx.fillStyle = '#ffffff';
       for (const c of columns) ctx.fillRect(c.x | 0, c.y | 0, c.w | 0, c.h | 0);
     }
 
-    function drawEnemies() {
-      ctx.fillStyle = '#ffffff';
-      for (const e of enemies) {
-        ctx.beginPath();
-        ctx.moveTo(e.x + e.w / 2, e.y);
-        ctx.lineTo(e.x, e.y + e.h);
-        ctx.lineTo(e.x + e.w, e.y + e.h);
-        ctx.closePath();
-        ctx.fill();
-      }
-    }
+    function drawEnemies() { for (const e of enemies) drawShip(e.x, e.y, e.w, e.h, Math.PI); }
 
     function drawBullets() {
       ctx.fillStyle = '#ffffff';
