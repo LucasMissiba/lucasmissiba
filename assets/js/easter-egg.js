@@ -100,159 +100,218 @@
   }
 
   function createGame(ctx, canvas, hud) {
-    let stars = [];
+    // Shooter vertical PB
     let score = 0;
     let lives = 3;
-    let lastSpawn = 0;
     let running = false;
     let visible = false;
     let rafId = 0;
     let state = 'menu'; // 'menu' | 'playing' | 'gameover'
 
+    // entidades
+    const stars = [];
+    const columns = [];
+    const enemies = [];
+    const bullets = [];
+
     const config = {
-      spawnEveryMs: 700,
-      minRadius: 8,
-      maxRadius: 16,
-      minSpeed: 90,
-      maxSpeed: 160
+      starCount: 80,
+      starMinSpeed: 28,
+      starMaxSpeed: 90,
+      playerSpeed: 280,
+      bulletSpeed: 520,
+      columnSpawnMs: 900,
+      enemySpawnMs: 1500,
+      columnSpeed: 180,
+      enemySpeed: 200,
+      columnWMin: 3,
+      columnWMax: 6,
+      columnHMin: 60,
+      columnHMax: 160
     };
 
-    // runner: estado do jogador
-    const player = { x: 40, y: 0, size: 22, vy: 0, jumping: false };
-    const gravity = 1400;
-    function groundY() { return canvas.clientHeight - 26; }
+    const keys = new Set();
+
+    const player = { x: 0, y: 0, w: 18, h: 22, lastShot: 0, shotCooldown: 220 };
 
     function randomBetween(min, max) { return Math.random() * (max - min) + min; }
 
-    function spawnStar() {
-      const r = randomBetween(config.minRadius, config.maxRadius);
-      stars.push({
-        x: canvas.clientWidth + r,
-        y: groundY() - r,
-        r,
-        vy: randomBetween(config.minSpeed, config.maxSpeed),
-        alive: true
-      });
+    function resetPlayer() {
+      player.x = Math.round(canvas.clientWidth / 2 - player.w / 2);
+      player.y = Math.round(canvas.clientHeight - player.h - 16);
+      player.lastShot = 0;
     }
 
-    function drawStar(s) {
-      ctx.save();
-      ctx.fillStyle = DMG.darkest;
-      ctx.beginPath();
-      const spikes = 5;
-      const outer = s.r;
-      const inner = s.r * 0.5;
-      let rot = Math.PI / 2 * 3;
-      const x = s.x, y = s.y;
-      ctx.moveTo(x, y - outer);
-      for (let i = 0; i < spikes; i++) {
-        ctx.lineTo(x + Math.cos(rot) * outer, y + Math.sin(rot) * outer);
-        rot += Math.PI / spikes;
-        ctx.lineTo(x + Math.cos(rot) * inner, y + Math.sin(rot) * inner);
-        rot += Math.PI / spikes;
+    function ensureStars() {
+      while (stars.length < config.starCount) {
+        stars.push({
+          x: Math.random() * canvas.clientWidth,
+          y: Math.random() * canvas.clientHeight,
+          s: randomBetween(config.starMinSpeed, config.starMaxSpeed),
+          r: Math.random() < 0.85 ? 1 : 2
+        });
       }
-      ctx.lineTo(x, y - outer);
-      ctx.closePath();
-      ctx.fill();
-      ctx.restore();
     }
 
-    function setHud() {
-      hud.textContent = `Score: ${score} • Vidas: ${lives}`;
+    function spawnColumn() {
+      const w = Math.round(randomBetween(config.columnWMin, config.columnWMax));
+      const h = Math.round(randomBetween(config.columnHMin, config.columnHMax));
+      const x = Math.round(randomBetween(8, Math.max(8, canvas.clientWidth - w - 8)));
+      columns.push({ x, y: -h, w, h, vy: config.columnSpeed });
     }
+
+    function spawnEnemy() {
+      const w = 16, h = 18;
+      const x = Math.round(randomBetween(10, canvas.clientWidth - w - 10));
+      enemies.push({ x, y: -h, w, h, vy: config.enemySpeed, t: Math.random() * Math.PI * 2 });
+    }
+
+    function shoot(now) {
+      if (now - player.lastShot < player.shotCooldown) return;
+      player.lastShot = now;
+      bullets.push({ x: player.x + player.w / 2 - 1, y: player.y - 6, w: 2, h: 8, vy: -config.bulletSpeed });
+    }
+
+    function setHud() { hud.textContent = `Score: ${score} • Vidas: ${lives}`; }
 
     function drawBackground() {
-      ctx.fillStyle = DMG.light;
+      ctx.fillStyle = '#0f0f0f';
       ctx.fillRect(0, 0, canvas.clientWidth, canvas.clientHeight);
-    }
-
-    function drawMenu() {
-      drawBackground();
-      ctx.fillStyle = DMG.darkest;
-      ctx.textAlign = 'center';
-      ctx.font = '700 24px Orbitron, system-ui, sans-serif';
-      ctx.fillText('RUNNER', canvas.clientWidth / 2, canvas.clientHeight * 0.38);
-      ctx.font = '400 14px Rajdhani, system-ui, sans-serif';
-      ctx.fillText('Espaço/↑ para iniciar e pular', canvas.clientWidth / 2, canvas.clientHeight * 0.52);
-    }
-
-    function drawGameOver() {
-      drawBackground();
-      for (const s of stars) drawStar(s);
-      ctx.fillStyle = 'rgba(0,0,0,0.6)';
-      ctx.fillRect(0, 0, canvas.clientWidth, canvas.clientHeight);
-      ctx.fillStyle = DMG.darkest;
-      ctx.textAlign = 'center';
-      ctx.font = '700 22px Orbitron, system-ui, sans-serif';
-      ctx.fillText('GAME OVER', canvas.clientWidth / 2, canvas.clientHeight * 0.45);
-      ctx.font = '400 14px Rajdhani, system-ui, sans-serif';
-      ctx.fillText('Start: Resetar  •  B/Esc: Sair', canvas.clientWidth / 2, canvas.clientHeight * 0.55);
-    }
-
-    function update(dt) {
-      // jogador
-      const base = groundY() - player.size;
-      if (player.jumping) {
-        player.vy += gravity * dt;
-        player.y += player.vy * dt;
-        if (player.y >= base) { player.y = base; player.vy = 0; player.jumping = false; }
-      } else {
-        player.y = base;
-      }
-
-      // obstaculos
-      for (const s of stars) {
-        if (!s.alive) continue;
-        s.x -= s.vy * dt * 0.7;
-        if (s.x + s.r < 0) { s.alive = false; score += 1; }
-        // colisao círculo x retângulo
-        const px = player.x, py = player.y, pw = player.size, ph = player.size;
-        const nx = Math.max(px, Math.min(s.x, px + pw));
-        const ny = Math.max(py, Math.min(s.y, py + ph));
-        const dx = s.x - nx, dy = s.y - ny;
-        if (dx*dx + dy*dy <= s.r*s.r) { s.alive = false; lives -= 1; }
-      }
-      stars = stars.filter(s => s.alive);
-
-      const now = performance.now();
-      if (now - lastSpawn >= config.spawnEveryMs) {
-        spawnStar();
-        lastSpawn = now;
+      // estrelas
+      ctx.fillStyle = '#ffffff';
+      for (const st of stars) {
+        ctx.fillRect(st.x | 0, st.y | 0, st.r, st.r);
       }
     }
 
-    function drawGround() {
-      const h = canvas.clientHeight;
-      ctx.fillStyle = DMG.mid;
-      ctx.fillRect(0, h - 26, canvas.clientWidth, 2);
-      // marcas de chão
-      ctx.fillStyle = DMG.dark;
-      const step = 18;
-      for (let x = 0; x < canvas.clientWidth; x += step) ctx.fillRect(x, h - 20, 8, 2);
+    function drawPlayer() {
+      ctx.fillStyle = '#ffffff';
+      // nave triangular PB
+      ctx.beginPath();
+      ctx.moveTo(player.x + player.w / 2, player.y); // topo
+      ctx.lineTo(player.x, player.y + player.h);
+      ctx.lineTo(player.x + player.w, player.y + player.h);
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    function drawColumns() {
+      ctx.fillStyle = '#ffffff';
+      for (const c of columns) ctx.fillRect(c.x | 0, c.y | 0, c.w | 0, c.h | 0);
+    }
+
+    function drawEnemies() {
+      ctx.fillStyle = '#ffffff';
+      for (const e of enemies) {
+        ctx.beginPath();
+        ctx.moveTo(e.x + e.w / 2, e.y);
+        ctx.lineTo(e.x, e.y + e.h);
+        ctx.lineTo(e.x + e.w, e.y + e.h);
+        ctx.closePath();
+        ctx.fill();
+      }
+    }
+
+    function drawBullets() {
+      ctx.fillStyle = '#ffffff';
+      for (const b of bullets) ctx.fillRect(b.x | 0, b.y | 0, b.w | 0, b.h | 0);
+    }
+
+    function aabb(a, b) { return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y; }
+
+    let lastColSpawn = 0, lastEnemySpawn = 0;
+
+    function update(dt, now) {
+      // stars
+      for (const st of stars) {
+        st.y += st.s * dt;
+        if (st.y > canvas.clientHeight) { st.y = -2; st.x = Math.random() * canvas.clientWidth; }
+      }
+
+      // movimento do jogador
+      let dx = 0;
+      if (keys.has('ArrowLeft')) dx -= 1;
+      if (keys.has('ArrowRight')) dx += 1;
+      player.x += dx * config.playerSpeed * dt;
+      if (player.x < 4) player.x = 4;
+      if (player.x + player.w > canvas.clientWidth - 4) player.x = canvas.clientWidth - player.w - 4;
+
+      if (keys.has('Space')) shoot(now);
+
+      // spawns
+      if (now - lastColSpawn > config.columnSpawnMs) { spawnColumn(); lastColSpawn = now; }
+      if (now - lastEnemySpawn > config.enemySpawnMs) { spawnEnemy(); lastEnemySpawn = now; }
+
+      // atualiza colunas e inimigos
+      for (const c of columns) c.y += c.vy * dt;
+      for (const e of enemies) { e.y += e.vy * dt; e.x += Math.sin((now / 600 + e.t)) * 0.4; }
+
+      // balas
+      for (const b of bullets) b.y += b.vy * dt;
+
+      // colisões bala x inimigos/colunas
+      for (const b of bullets) {
+        if (b._dead) continue;
+        for (const e of enemies) {
+          if (!e._dead && aabb(b, e)) { e._dead = true; b._dead = true; score += 10; break; }
+        }
+        if (!b._dead) {
+          for (const c of columns) { if (!c._dead && aabb(b, c)) { c._dead = true; b._dead = true; score += 5; break; } }
+        }
+      }
+
+      // colisões player x obstaculos
+      for (const e of enemies) if (!e._dead && aabb(player, e)) { e._dead = true; lives -= 1; }
+      for (const c of columns) if (!c._dead && aabb(player, c)) { c._dead = true; lives -= 1; }
+
+      // limpeza
+      function inView(o) { return o.y < canvas.clientHeight + 40 && o.y + (o.h || 0) > -40; }
+      for (let i = bullets.length - 1; i >= 0; i--) if (bullets[i]._dead || bullets[i].y + bullets[i].h < 0) bullets.splice(i, 1);
+      for (let i = enemies.length - 1; i >= 0; i--) if (enemies[i]._dead || !inView(enemies[i])) enemies.splice(i, 1);
+      for (let i = columns.length - 1; i >= 0; i--) if (columns[i]._dead || !inView(columns[i])) columns.splice(i, 1);
     }
 
     function drawGame() {
       drawBackground();
-      drawGround();
-      for (const s of stars) drawStar(s);
-      // personagem simples
-      ctx.fillStyle = DMG.darkest;
-      ctx.fillRect(player.x, Math.round(player.y), player.size, player.size);
+      drawColumns();
+      drawEnemies();
+      drawBullets();
+      drawPlayer();
+    }
+
+    function drawMenu() {
+      drawBackground();
+      ctx.fillStyle = '#ffffff';
+      ctx.textAlign = 'center';
+      ctx.font = '700 18px Orbitron, system-ui, sans-serif';
+      ctx.fillText('SPACE SHOOTER', canvas.clientWidth / 2, canvas.clientHeight * 0.40);
+      ctx.font = '400 13px Rajdhani, system-ui, sans-serif';
+      ctx.fillText('Setas: mover  •  Espaço: atirar  •  R: reset', canvas.clientWidth / 2, canvas.clientHeight * 0.55);
+    }
+
+    function drawGameOver() {
+      drawBackground();
+      ctx.fillStyle = 'rgba(0,0,0,0.6)';
+      ctx.fillRect(0, 0, canvas.clientWidth, canvas.clientHeight);
+      ctx.fillStyle = '#ffffff';
+      ctx.textAlign = 'center';
+      ctx.font = '700 20px Orbitron, system-ui, sans-serif';
+      ctx.fillText('GAME OVER', canvas.clientWidth / 2, canvas.clientHeight * 0.45);
+      ctx.font = '400 13px Rajdhani, system-ui, sans-serif';
+      ctx.fillText('Pressione Enter para reiniciar', canvas.clientWidth / 2, canvas.clientHeight * 0.58);
     }
 
     function loop(prevTs) {
       if (!running || !visible) return;
       rafId = requestAnimationFrame(ts => {
         const dt = Math.min(0.033, (ts - prevTs) / 1000);
+        const now = performance.now();
+        ensureStars();
         if (state === 'playing') {
-          update(dt);
+          update(dt, now);
           drawGame();
           setHud();
-          if (lives <= 0) {
-            state = 'gameover';
-            running = false;
-            drawGameOver();
-          }
+          if (lives <= 0) { state = 'gameover'; running = false; drawGameOver(); }
         } else if (state === 'menu') {
           drawMenu();
         } else if (state === 'gameover') {
@@ -263,61 +322,34 @@
     }
 
     function reset() {
-      score = 0;
-      lives = 3;
-      stars = [];
-      lastSpawn = performance.now();
+      score = 0; lives = 3;
+      stars.length = 0; columns.length = 0; enemies.length = 0; bullets.length = 0;
+      resetPlayer();
       setHud();
     }
 
-    function startGame() {
-      reset();
-      state = 'playing';
-      running = true;
-    }
+    function startGame() { reset(); state = 'playing'; running = true; }
 
-    function open() {
-      visible = true;
-      running = true;
-      state = 'menu';
-      setHud();
-      drawMenu();
-      cancelAnimationFrame(rafId);
-      loop(performance.now());
-    }
+    function open() { visible = true; running = true; state = 'menu'; resetPlayer(); setHud(); cancelAnimationFrame(rafId); loop(performance.now()); }
+    function close() { visible = false; running = false; cancelAnimationFrame(rafId); rafId = 0; }
 
-    function close() {
-      visible = false;
-      running = false;
-      cancelAnimationFrame(rafId);
-      rafId = 0;
-    }
-
-    function handlePointerClick(evt) {
-      // pulo via clique
-      if (state !== 'playing') return;
-      jump();
-    }
-
-    function jump() { if (!player.jumping) { player.jumping = true; player.vy = -520; } }
+    function keyDown(e) { keys.add(e.code === 'Space' ? 'Space' : e.key); }
+    function keyUp(e) { keys.delete(e.code === 'Space' ? 'Space' : e.key); }
 
     function keyHandler(e) {
       if (!visible) return;
       if (e.key === 'Escape') { close(); return; }
       if (state === 'menu') {
-        if (e.key === 'Enter' || e.code === 'Space' || e.key.toLowerCase() === 'a') startGame();
-        if (e.key.toLowerCase() === 'b') close();
+        if (e.key === 'Enter' || e.code === 'Space') startGame();
       } else if (state === 'playing') {
         if (e.key.toLowerCase() === 'r') reset();
-        if (e.code === 'Space' || e.code === 'ArrowUp') jump();
-        if (e.key.toLowerCase() === 'b') { state = 'menu'; running = false; drawMenu(); }
       } else if (state === 'gameover') {
-        if (e.key === 'Enter' || e.code === 'Space' || e.key.toLowerCase() === 'a') startGame();
-        if (e.key.toLowerCase() === 'b') close();
+        if (e.key === 'Enter' || e.code === 'Space') startGame();
       }
     }
 
-    canvas.addEventListener('click', handlePointerClick);
+    window.addEventListener('keydown', keyDown);
+    window.addEventListener('keyup', keyUp);
     window.addEventListener('keydown', keyHandler);
 
     return { open, close, startGame, reset, isVisible: () => visible, state: () => state };
