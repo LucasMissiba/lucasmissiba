@@ -1,20 +1,25 @@
-# 👋 Olá, eu sou o Lucas Missiba  
+👋 Hello, I’m Lucas Missiba
 
-Bem-vindo ao meu GitHub! Aqui você encontra meus projetos e estudos em desenvolvimento web, automação e análise de dados. 🚀  
+Welcome to my GitHub! Here you’ll find a selection of my projects and studies focused on web development, automation, and data analysis. 🚀
 
-🔗 Confira mais sobre mim:  
-- 🌐 [Portfólio](https://lucasmissiba.github.io/lucasmissiba/)  
-- 💼 [LinkedIn](https://www.linkedin.com/in/lucasmissiba)  
-- 💻 [GitHub](https://github.com/LucasMissiba)  
+🔗 Learn more about me:
 
-✉️ **lucasmissiba9@gmail.com**
-## 📬 Contato
-Caso queira trocar ideias ou colaborar em projetos, entre em contato:  
+🌐 Portfolio
 
-- 📧 **Email:** lucasmissiba9@gmail.com  
-- 💼 **LinkedIn:** [linkedin.com/in/lucasmissiba](https://www.linkedin.com/in/lucasmissiba)  
-- 💻 **GitHub:** [github.com/LucasMissiba](https://github.com/LucasMissiba)
+💼 LinkedIn
 
----
+💻 GitHub
 
-🔹 *Criando o extraordinário a partir do simples.*  
+✉️ lucasmissiba9@gmail.com
+
+📬 Contact
+
+If you’re interested in connecting, collaborating, or discussing opportunities, feel free to reach out:
+
+📧 Email: lucasmissiba9@gmail.com
+
+💼 LinkedIn: linkedin.com/in/lucasmissiba
+
+💻 GitHub: github.com/LucasMissiba
+
+🔹 Driven to create impactful solutions through technology.
