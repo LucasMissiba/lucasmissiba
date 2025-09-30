@@ -6,18 +6,9 @@ Welcome to my GitHub! Here you’ll find my projects and studies focused on **we
 
 ### 🔗 Learn more about me
 
-[![Portfolio](https://img.shields.io/badge/Portfolio-000000?style=for-the-badge&logo=google-chrome&logoColor=white)](https://seu-portfolio-aqui.com)  
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://linkedin.com/in/lucasmissiba)  
-[![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/LucasMissiba)  
+[![Portfolio](https://img.shields.io/badge/Portfolio-000000?style=for-the-badge&logo=google-chrome&logoColor=white)](https://lucasmissiba.github.io/lucasmissiba/)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://linkedin.com/in/lucas-missiba-6a95ab179/)  
 [![Email](https://img.shields.io/badge/Email-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:lucasmissiba9@gmail.com)
-
----
-
-### 📫 Contact me
-
-📧 Email: lucasmissiba9@gmail.com  
-💼 LinkedIn: [linkedin.com/in/lucasmissiba](https://linkedin.com/in/lucasmissiba)  
-💻 GitHub: [github.com/LucasMissiba](https://github.com/LucasMissiba)
 
 ---
 
