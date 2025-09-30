@@ -57,6 +57,6 @@ Welcome to my GitHub! Here you’ll find my projects and studies focused on **we
 
 ---
 <p align="center">
-  <img src="https://giphy.com/gifs/cartoon-halloween-ghost-aTf4PONtSYB1e" alt="Ghost GIF" width="200" />
+  <img src="https://media.giphy.com/media/aTf4PONtSYB1e/giphy.gif" alt="Ghost GIF" width="200" />
 </p>
 
